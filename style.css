@@ -248,6 +248,38 @@ h3 {
   opacity: 0.85;
 }
 
+/* Coupon Controls Section */
+.coupon-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 12px 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .05);
+  margin-bottom: 20px;
+}
+
+#toggle-active-coupons {
+  background-color: var(--blue);
+  font-size: 0.95em;
+  font-weight: bold;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#toggle-active-coupons:hover {
+  background-color: #0e739a;
+  transform: scale(1.03);
+}
+
+#coupon-filter-label {
+  font-size: 0.9em;
+  font-style: italic;
+  color: #555;
+}
+
 /* STATUS MESSAGES */
 .success {
   color: var(--green);
