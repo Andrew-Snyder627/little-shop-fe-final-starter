@@ -33,9 +33,32 @@ submitMerchantButton.addEventListener('click', (event) => {
   submitMerchant(event)
 })
 
+document.addEventListener("click", (event) => {
+  if (event.target.id === "toggle-active-coupons") {
+    const toggleBtn = event.target;
+
+    // Toggle between all and active coupons
+    if (!isViewingActiveCoupons) {
+      fetchData(`merchants/${currentMerchantId}/coupons?active=true`)
+        .then(couponData => {
+          isViewingActiveCoupons = true;
+          displayMerchantCoupons(couponData, currentMerchantId);
+        });
+    } else {
+      fetchData(`merchants/${currentMerchantId}/coupons`)
+        .then(couponData => {
+          isViewingActiveCoupons = false;
+          displayMerchantCoupons(couponData, currentMerchantId);
+        });
+    }
+  }
+});
+
 //Global variables
 let merchants;
 let items;
+let currentMerchantId = null; // Using to filter the coupons for active and inactive
+let isViewingActiveCoupons = false; // Toggle between filtering active coupons and showing all coupons
 
 //Page load data fetching
 Promise.all([fetchData('merchants'), fetchData('items')])
@@ -139,6 +162,7 @@ function submitMerchant(event) {
 
 // Functions that control the view 
 function showMerchantsView() {
+  isViewingActiveCoupons = false
   showingText.innerText = "All Merchants"
   addRemoveActiveNav(merchantsNavButton, itemsNavButton)
   addNewButton.dataset.state = 'merchant'
@@ -148,6 +172,7 @@ function showMerchantsView() {
 }
 
 function showItemsView() {
+  isViewingActiveCoupons = false
   showingText.innerText = "All Items"
   addRemoveActiveNav(itemsNavButton, merchantsNavButton)
   addNewButton.dataset.state = 'item'
@@ -235,11 +260,16 @@ function displayMerchantItems(event) {
 function getMerchantCoupons(event) {
   let merchantId = event.target.closest("article").id.split('-')[1]
   console.log("Merchant ID:", merchantId)
+  currentMerchantId = merchantId;
 
-  fetchData(`merchants/${merchantId}/coupons`)
-  .then(couponData => {
+  Promise.all([
+    fetchData(`merchants/${merchantId}/coupons`),
+    fetchData(`merchants/${merchantId}`)
+  ])
+  
+  .then(([couponData, merchantData]) => {
     console.log("Coupon data from fetch:", couponData)
-    displayMerchantCoupons(couponData, merchantId);
+    displayMerchantCoupons(couponData, merchantId, merchantData);
   })
 }
 
@@ -257,18 +287,33 @@ function displayMerchantCoupons(couponData, merchantId) {
     return
   }
 
-  couponsView.innerHTML = merchantCoupons.map((coupon) => {
-    return `
-      <article class="coupon ${coupon.attributes.active ? 'active' : 'inactive'}" id="coupon-${coupon.id}">
-        <h3>${coupon.attributes.name}</h3>
-        <p>Code: <strong>${coupon.attributes.code}</strong></p>
-        <p>Type: ${coupon.attributes.value_type}</p>
-        <p>Value: ${coupon.attributes.value}${coupon.attributes.value_type === "percent" ? "%" : ""}</p>
-        <p>Status: ${coupon.attributes.active ? "Active" : "Inactive"}</p>
-        <p>Times Used: ${coupon.attributes.times_used}</p>
-      </article>  
-    `
-  }).join("")
+  // Determine button and label text based on the current filter state
+  const toggleText = isViewingActiveCoupons ? "View All Coupons" : "View Active Coupons";
+  const stateAttr = isViewingActiveCoupons ? "active" : "all";
+  const filterText = isViewingActiveCoupons
+    ? "Currently showing: Active Coupons Only"
+    : "Currently showing: All Coupons";
+
+  couponsView.innerHTML = `
+    <div class="coupon-controls">
+      <button id="toggle-active-coupons" data-state="${stateAttr}">${toggleText}</button>
+      <p class="coupon-filter-label" id="coupon-filter-label">${filterText}</p>
+    </div>
+    <div id="coupon-list">
+      ${merchantCoupons.map((coupon) => {
+        return `
+          <article class="coupon ${coupon.attributes.active ? 'active' : 'inactive'}" id="coupon-${coupon.id}">
+            <h3>${coupon.attributes.name}</h3>
+            <p>Code: <strong>${coupon.attributes.code}</strong></p>
+            <p>Type: ${coupon.attributes.value_type}</p>
+            <p>Value: ${coupon.attributes.value}${coupon.attributes.value_type === "percent" ? "%" : ""}</p>
+            <p>Status: ${coupon.attributes.active ? "Active" : "Inactive"}</p>
+            <p>Times Used: ${coupon.attributes.times_used}</p>
+          </article>
+        `
+      }).join("")}
+    </div>
+  `
 }
 
 //Helper Functions
