@@ -143,7 +143,7 @@ function showMerchantsView() {
   addRemoveActiveNav(merchantsNavButton, itemsNavButton)
   addNewButton.dataset.state = 'merchant'
   show([merchantsView, addNewButton])
-  hide([itemsView])
+  hide([itemsView, couponsView, merchantForm])
   displayMerchants(merchants)
 }
 
@@ -259,7 +259,7 @@ function displayMerchantCoupons(couponData, merchantId) {
 
   couponsView.innerHTML = merchantCoupons.map((coupon) => {
     return `
-      <article class="coupon" id="coupon-${coupon.id}">
+      <article class="coupon ${coupon.attributes.active ? 'active' : 'inactive'}" id="coupon-${coupon.id}">
         <h3>${coupon.attributes.name}</h3>
         <p>Code: <strong>${coupon.attributes.code}</strong></p>
         <p>Type: ${coupon.attributes.value_type}</p>

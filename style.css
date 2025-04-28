@@ -239,6 +239,15 @@ h3 {
   margin: 0 auto;
 }
 
+.coupon.active {
+  border-left: 6px solid var(--green);
+}
+
+.coupon.inactive {
+  border-left: 6px solid var(--red);
+  opacity: 0.85;
+}
+
 /* STATUS MESSAGES */
 .success {
   color: var(--green);
