@@ -35,7 +35,6 @@ submitMerchantButton.addEventListener('click', (event) => {
 
 document.addEventListener("click", (event) => {
   if (event.target.id === "toggle-active-coupons") {
-    const toggleBtn = event.target;
 
     // Toggle between all and active coupons
     if (!isViewingActiveCoupons) {
@@ -290,9 +289,7 @@ function displayMerchantCoupons(couponData, merchantId) {
   // Determine button and label text based on the current filter state
   const toggleText = isViewingActiveCoupons ? "View All Coupons" : "View Active Coupons";
   const stateAttr = isViewingActiveCoupons ? "active" : "all";
-  const filterText = isViewingActiveCoupons
-    ? "Currently showing: Active Coupons Only"
-    : "Currently showing: All Coupons";
+  const filterText = isViewingActiveCoupons ? "Currently showing: Active Coupons Only" : "Currently showing: All Coupons";
 
   couponsView.innerHTML = `
     <div class="coupon-controls">
